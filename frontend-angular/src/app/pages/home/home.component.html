@@ -1,0 +1,52 @@
+<mat-toolbar color="primary">
+  <span>Community Service</span>
+  <span class="spacer"></span>
+  <ng-container *ngIf="isLoggedIn; else loggedOutActions">
+    <a mat-button routerLink="/events">Events</a>
+    <a mat-button routerLink="/dashboard">Dashboard</a>
+    <a mat-button routerLink="/profile">Profile</a>
+    <a mat-button routerLink="/login" (click)="$event.preventDefault(); logout()">Logout</a>
+  </ng-container>
+  <ng-template #loggedOutActions>
+    <button mat-flat-button color="primary" class="login-btn" routerLink="/login" aria-label="Log in">
+      Log in
+    </button>
+  </ng-template>
+  <button mat-button (click)="theme.toggle()" aria-label="Toggle theme">
+    {{ theme.isDark() ? 'Light mode' : 'Dark mode' }}
+  </button>
+</mat-toolbar>
+
+<div class="container">
+  <h2>Welcome!</h2>
+  <p>
+    Discover community service opportunities across Hyderabad and track your impact.
+    Join NSS drives, environmental cleanups, food distribution, literacy programs, and more.
+  </p>
+  <p>
+    - Browse upcoming events and register in one click.<br/>
+    - Check in/out to record hours for your profile and leaderboard.<br/>
+    - View your participation history on the dashboard.
+  </p>
+  <div style="margin-top:16px" *ngIf="isLoggedIn">
+    <a mat-raised-button color="primary" routerLink="/events">Explore Events</a>
+    <a mat-stroked-button style="margin-left:8px" routerLink="/dashboard">View Dashboard</a>
+  </div>
+
+  <div class="grid" style="margin-top:24px">
+    <mat-card>
+      <mat-card-title>How it Works</mat-card-title>
+      <mat-card-content>
+        Register for events, check in/out on the day, and your hours are added to your profile automatically.
+        Your dashboard shows participation and achievements.
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-title>Highlights</mat-card-title>
+      <mat-card-content>
+        Hyderabad drives this season: lake cleanup at Hussain Sagar, Annadanam distribution, Swachh Bharat in Old City,
+        and tree planting at Durgam Cheruvu.
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

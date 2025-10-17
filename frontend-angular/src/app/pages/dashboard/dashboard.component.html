@@ -1,0 +1,47 @@
+<mat-toolbar color="primary">
+  <span>Community Service</span>
+  <span class="spacer"></span>
+  <nav class="nav-links">
+    <a mat-button routerLink="/home">Home</a>
+    <a mat-button routerLink="/events">Events</a>
+    <a mat-button routerLink="/dashboard">Dashboard</a>
+    <a mat-button routerLink="/profile">Profile</a>
+    <a mat-button routerLink="/login" (click)="$event.preventDefault(); logout()">Logout</a>
+    <button mat-button (click)="theme.toggle()" aria-label="Toggle theme">{{ theme.isDark() ? 'Light mode' : 'Dark mode' }}</button>
+  </nav>
+</mat-toolbar>
+
+<div class="container">
+  <h2>Dashboard</h2>
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div class="error" *ngIf="error">{{ error }}</div>
+
+  <!-- Participation Graph -->
+  <div class="chart-container">
+    <canvas #participationChart></canvas>
+  </div>
+
+  <h3>Registered Events</h3>
+  <div class="grid">
+    <mat-card *ngFor="let e of registered">
+      <mat-card-title>{{ e.title }}</mat-card-title>
+      <mat-card-content>
+        <p>{{ e.description }}</p>
+        <p>{{ e.date }} {{ e.time }} &#64; {{ e.location }}</p>
+        <p>Status: {{ e.status }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <h3 style="margin-top:24px">Attended Events</h3>
+  <div class="grid">
+    <mat-card *ngFor="let a of attended">
+      <mat-card-title>{{ a.event?.title }}</mat-card-title>
+      <mat-card-content>
+        <p>Hours: {{ a.hours }}</p>
+        <p>Checked in: {{ a.checkInTime }}</p>
+        <p>Checked out: {{ a.checkOutTime }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

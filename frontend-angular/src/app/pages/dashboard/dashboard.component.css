@@ -1,0 +1,85 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+h2, h3 {
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.error {
+  color: #f44336;
+  padding: 16px;
+  margin: 16px 0;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
+/* Chart Container Styles */
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  margin: 24px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+mat-card {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+mat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+mat-card-title {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+mat-card-content p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+/* Dark theme support */
+:host-context(.dark-theme) .chart-container {
+  background: #424242;
+}
+
+:host-context(.dark-theme) h2,
+:host-context(.dark-theme) h3 {
+  color: #fff;
+}
+
+:host-context(.dark-theme) .error {
+  color: #ffcdd2;
+  background-color: #b71c1c;
+}
+
+:host-context(.dark-theme) mat-card-content p {
+  color: #bbb;
+}

@@ -1,0 +1,16 @@
+.login-btn {
+  text-transform: none; /* Avoid all caps for professionalism */
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 14px;
+}
+
+.login-btn:hover {
+  filter: brightness(0.98);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+
