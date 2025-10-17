@@ -16,18 +16,28 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const res = await this.api.client.post('/auth/login', { email, password });
-    const { token, user } = res.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    sessionStorage.setItem('authenticated', 'true');
-    this.authStateSubject.next(true);
-    return { token, user };
+    try {
+      const res = await this.api.client.post('/auth/login', { email, password });
+      const { token, user } = res.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('authenticated', 'true');
+      this.authStateSubject.next(true);
+      return { token, user };
+    } catch (error: any) {
+      // Re-throw the error so it can be caught by the login component
+      throw error;
+    }
   }
 
   async register(userData: any) {
-    const res = await this.api.client.post('/auth/register', userData);
-    return res.data;
+    try {
+      const res = await this.api.client.post('/auth/register', userData);
+      return res.data;
+    } catch (error: any) {
+      // Re-throw the error so it can be caught by the login component
+      throw error;
+    }
   }
 
   logout() {

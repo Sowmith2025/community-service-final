@@ -1,60 +1,29 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const Event = require('../models/Event');
+const auth = require('../middleware/auth'); // if you use JWT authentication
 
-const eventSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  date: {
-    type: String,
-    required: true
-  },
-  time: {
-    type: String,
-    required: true
-  },
-  location: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  maxVolunteers: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  organizerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  category: {
-    type: String,
-    enum: ['environment', 'community', 'nss', 'education', 'health', 'other'],
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
-    default: 'upcoming'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+// DELETE: Organizer can delete their event
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    // Find the event by ID
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Ensure only the organizer who created the event can delete it
+    if (event.organizerId.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied. You can delete only your own events.' });
+    }
+
+    await event.deleteOne();
+    res.status(200).json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error while deleting event' });
   }
-}, {
-  timestamps: true
 });
 
-// Indexes for faster queries
-eventSchema.index({ date: 1 });
-eventSchema.index({ category: 1 });
-eventSchema.index({ status: 1 });
-eventSchema.index({ organizerId: 1 });
-
-module.exports = mongoose.model('Event', eventSchema);
+module.exports = router;

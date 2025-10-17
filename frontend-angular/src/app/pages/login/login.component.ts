@@ -53,7 +53,19 @@ export class LoginComponent {
         }
       }
     } catch (e: any) {
-      this.error = e?.response?.data?.message || (this.isSignup ? 'Registration failed' : 'Login failed');
+      console.error('Auth error:', e);
+      // Properly extract error message from axios error structure
+      let errorMessage = this.isSignup ? 'Registration failed' : 'Login failed';
+      
+      if (e?.response?.data?.message) {
+        errorMessage = e.response.data.message;
+      } else if (e?.message) {
+        errorMessage = e.message;
+      } else if (typeof e === 'string') {
+        errorMessage = e;
+      }
+      
+      this.error = errorMessage;
     } finally {
       this.loading = false;
     }

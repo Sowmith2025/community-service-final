@@ -36,7 +36,7 @@ export class EventsComponent implements OnInit {
     time: '',
     location: '',
     maxVolunteers: 20,
-    category: 'general'
+    category: 'other'
   };
 
   constructor(private eventsService: EventsService, private auth: AuthService, private usersService: UsersService, public theme: ThemeService, private router: Router) {}
@@ -130,7 +130,7 @@ export class EventsComponent implements OnInit {
       const payload = { ...this.newEvent, organizerId: user.id };
       const res = await this.eventsService.create(payload);
       this.events = [res.data.event, ...this.events];
-      this.newEvent = { title: '', description: '', date: '', time: '', location: '', maxVolunteers: 20, category: 'general' };
+      this.newEvent = { title: '', description: '', date: '', time: '', location: '', maxVolunteers: 20, category: 'other' };
     } catch (e: any) {
       this.error = e?.response?.data?.message || 'Failed to create event';
     } finally {

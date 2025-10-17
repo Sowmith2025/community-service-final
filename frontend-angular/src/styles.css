@@ -3,13 +3,13 @@
 
 /* Color System */
 :root {
-  --color-primary: #4f46e5; /* indigo-600 */
-  --color-primary-contrast: #ffffff;
+  --color-primary: #1004fa; /* indigo-600 */
+  --color-primary-contrast: #fe0808;
   --color-accent: #22c55e; /* emerald-500 */
   --color-warn: #ef4444; /* red-500 */
   --color-text: #0f172a; /* slate-900 */
   --color-text-muted: #475569; /* slate-600 */
-  --color-bg: #f8fafc; /* slate-50 */
+  --color-bg: #fcfdfe; /* slate-50 */
   --color-card: #ffffff;
   --color-border: #e2e8f0; /* slate-200 */
 }

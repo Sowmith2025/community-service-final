@@ -41,7 +41,14 @@
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Category</mat-label>
-        <input matInput [(ngModel)]="newEvent.category" name="category" />
+        <select matNativeControl [(ngModel)]="newEvent.category" name="category">
+          <option value="environment">Environment</option>
+          <option value="community">Community</option>
+          <option value="nss">NSS</option>
+          <option value="education">Education</option>
+          <option value="health">Health</option>
+          <option value="other">Other</option>
+        </select>
       </mat-form-field>
     </div>
     <button mat-raised-button color="accent" (click)="createEvent()" [disabled]="creating">
