@@ -82,8 +82,6 @@ app.get('/api/health', (req, res) => {
 
 // --------------------------------------
 
-/*
-
 if (process.env.NODE_ENV === 'production') {
 
   const angularDistDir = path.join(__dirname, '../frontend-angular/dist/frontend-angular');
@@ -115,8 +113,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 
 }
-
-*/
 
 // --------------------------------------
 // 🚀 Start Server
