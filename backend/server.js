@@ -77,24 +77,46 @@ app.get('/api/health', (req, res) => {
 });
 
 // --------------------------------------
+
 // 🌐 Serve Frontend (Angular or React)
+
 // --------------------------------------
+
+/*
+
 if (process.env.NODE_ENV === 'production') {
+
   const angularDistDir = path.join(__dirname, '../frontend-angular/dist/frontend-angular');
+
   const reactBuildDir = path.join(__dirname, '../frontend/build');
 
+
+
   const useAngular = fs.existsSync(angularDistDir);
+
   const staticDir = useAngular ? angularDistDir : reactBuildDir;
+
+
 
   app.use(express.static(staticDir));
 
-  app.get('*', (req, res) => {
+
+
+  app.get('*' , (req, res) => {
+
     const indexFile = useAngular
+
       ? path.join(angularDistDir, 'index.html')
+
       : path.join(reactBuildDir, 'index.html');
+
     res.sendFile(indexFile);
+
   });
+
 }
+
+*/
 
 // --------------------------------------
 // 🚀 Start Server
