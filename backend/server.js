@@ -83,35 +83,27 @@ app.get('/api/health', (req, res) => {
 // --------------------------------------
 
 if (process.env.NODE_ENV === 'production') {
-
+  console.log('Running in production mode');
   const angularDistDir = path.join(__dirname, '../frontend-angular/dist/frontend-angular');
+  console.log('Looking for Angular dist directory at:', angularDistDir);
 
   const reactBuildDir = path.join(__dirname, '../frontend/build');
 
-
-
   const useAngular = fs.existsSync(angularDistDir);
+  console.log('Using Angular:', useAngular);
 
   const staticDir = useAngular ? angularDistDir : reactBuildDir;
-
-
+  console.log('Serving static files from:', staticDir);
 
   app.use(express.static(staticDir));
 
-
-
   app.get('*' , (req, res) => {
-
+    console.log(`Received request for: ${req.originalUrl}, sending index.html`);
     const indexFile = useAngular
-
       ? path.join(angularDistDir, 'index.html')
-
       : path.join(reactBuildDir, 'index.html');
-
     res.sendFile(indexFile);
-
   });
-
 }
 
 // --------------------------------------
