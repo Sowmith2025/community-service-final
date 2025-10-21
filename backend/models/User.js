@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
+    index: true
   },
   password: {
     type: String,
@@ -46,8 +47,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for faster queries
-userSchema.index({ email: 1 });
+// Index for faster queries (email is already indexed via schema definition)
 userSchema.index({ role: 1 });
 
 module.exports = mongoose.model('User', userSchema);

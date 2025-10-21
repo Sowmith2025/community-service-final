@@ -6,6 +6,36 @@ const Attendance = require('../models/Attendance');
 
 const router = express.Router();
 
+// Get all users
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    
+    // Get stats for each user
+    const usersWithStats = await Promise.all(users.map(async (user) => {
+      const userAttendance = await Attendance.find({ userId: user._id });
+      const totalHours = userAttendance.reduce((sum, record) => sum + record.hours, 0);
+      const completedEvents = userAttendance.filter(a => a.status === 'completed').length;
+      
+      return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        department: user.department,
+        hoursCompleted: totalHours,
+        eventsAttended: completedEvents,
+        joinedAt: user.joinedAt
+      };
+    }));
+    
+    res.json({ data: usersWithStats });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Update user profile
 router.put('/:id', async (req, res) => {
   try {
@@ -137,6 +167,34 @@ router.get('/leaderboard/top', async (req, res) => {
       .slice(0, 10);
 
     res.json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Delete user
+router.delete('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Delete associated registrations
+    await Registration.deleteMany({ userId: req.params.id });
+    
+    // Delete associated attendance records
+    await Attendance.deleteMany({ userId: req.params.id });
+    
+    // Delete events organized by this user if they're an organizer
+    if (user.role === 'organizer') {
+      await Event.deleteMany({ organizerId: req.params.id });
+    }
+    
+    // Delete the user
+    await User.findByIdAndDelete(req.params.id);
+    
+    res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

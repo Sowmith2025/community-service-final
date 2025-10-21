@@ -13,11 +13,27 @@ export class EventsService {
     return this.api.client.get(`/events/${id}`);
   }
 
+  create(eventData: any) {
+    return this.api.client.post('/events', eventData);
+  }
+
+  update(id: string, eventData: any) {
+    return this.api.client.put(`/events/${id}`, eventData);
+  }
+
+  delete(id: string) {
+    return this.api.client.delete(`/events/${id}`);
+  }
+
   register(eventId: string, userId: string) {
     return this.api.client.post(`/events/${eventId}/register`, { userId });
   }
 
-  create(eventData: any) {
-    return this.api.client.post('/events', eventData);
+  cancelRegistration(eventId: string, userId: string) {
+    return this.api.client.delete(`/events/${eventId}/register/${userId}`);
+  }
+
+  getRegistrations(eventId: string) {
+    return this.api.client.get(`/events/${eventId}/registrations`);
   }
 }

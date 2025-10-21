@@ -1,29 +1,58 @@
-const express = require('express');
-const router = express.Router();
-const Event = require('../models/Event');
-const auth = require('../middleware/auth'); // if you use JWT authentication
+const mongoose = require('mongoose');
 
-// DELETE: Organizer can delete their event
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    // Find the event by ID
-    const event = await Event.findById(req.params.id);
-
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-
-    // Ensure only the organizer who created the event can delete it
-    if (event.organizerId.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Access denied. You can delete only your own events.' });
-    }
-
-    await event.deleteOne();
-    res.status(200).json({ message: 'Event deleted successfully' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error while deleting event' });
+const eventSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  time: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  maxVolunteers: {
+    type: Number,
+    default: 20
+  },
+  organizerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  category: {
+    type: String,
+    enum: ['education', 'health', 'environment', 'community', 'sports', 'other'],
+    default: 'other'
+  },
+  status: {
+    type: String,
+    enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
+    default: 'upcoming'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
+}, {
+  timestamps: true
 });
 
-module.exports = router;
+// Index for faster queries
+eventSchema.index({ organizerId: 1 });
+eventSchema.index({ status: 1 });
+eventSchema.index({ date: 1 });
+
+module.exports = mongoose.model('Event', eventSchema);

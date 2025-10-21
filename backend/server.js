@@ -36,6 +36,7 @@ const eventRoutes = require('./routes/events');
 const userRoutes = require('./routes/users');
 const attendanceRoutes = require('./routes/attendance');
 const organizerRoutes = require('./routes/organizer');
+const registrationRoutes = require('./routes/registrations');
 
 // Optional authentication middleware (uncomment if you want role protection)
 // const auth = require('./middleware/auth');
@@ -61,52 +62,8 @@ app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/organizer', organizerRoutes);
+app.use('/api/registrations', registrationRoutes);
 
-// --------------------------------------
-// 🗑️ Inline DELETE Routes
-// --------------------------------------
-
-// Delete an Organizer
-if (Organizer) {
-  app.delete('/api/organizer/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-      const deleted = await Organizer.findByIdAndDelete(id);
-      if (!deleted) {
-        return res.status(404).json({ error: 'Organizer not found' });
-      }
-      return res.json({ message: 'Organizer deleted successfully', organizer: deleted });
-    } catch (err) {
-      console.error('Error deleting organizer:', err);
-      return res.status(500).json({ error: 'Server error' });
-    }
-  });
-}
-
-// Delete an Event (by organizer)
-app.delete('/api/events/:id', async (req, res) => {
-  try {
-    const eventId = req.params.id;
-
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-
-    // Uncomment if using JWT auth to restrict deletion to creator:
-    /*
-    if (event.organizerId.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Access denied. You can delete only your own events.' });
-    }
-    */
-
-    await event.deleteOne();
-    return res.status(200).json({ message: 'Event deleted successfully' });
-  } catch (err) {
-    console.error('Error deleting event:', err);
-    return res.status(500).json({ message: 'Server error while deleting event' });
-  }
-});
 
 // --------------------------------------
 // 🩺 Health Check Route

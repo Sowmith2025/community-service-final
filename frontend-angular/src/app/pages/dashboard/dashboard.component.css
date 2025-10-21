@@ -65,6 +65,17 @@ mat-card-content p {
   gap: 8px;
 }
 
+/* Button styling - white buttons */
+.nav-links a[mat-button],
+.nav-links button[mat-button] {
+  color: white !important;
+}
+
+.nav-links a[mat-button]:hover,
+.nav-links button[mat-button]:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Dark theme support */
 :host-context(.dark-theme) .chart-container {
   background: #424242;

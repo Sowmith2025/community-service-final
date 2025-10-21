@@ -9,9 +9,22 @@
 </mat-toolbar>
 
 <div class="events container">
-  <h2>Events</h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+    <h2 style="margin: 0;">Events</h2>
+    <mat-form-field appearance="outline" style="width: 400px; flex-shrink: 0;" floatLabel="auto">
+      <mat-label>🔍 Search Events</mat-label>
+      <input matInput [(ngModel)]="searchQuery" placeholder="Title, location, or category..." autocomplete="off" />
+      <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="searchQuery = ''" aria-label="Clear search">
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-icon matSuffix *ngIf="!searchQuery">search</mat-icon>
+    </mat-form-field>
+  </div>
   <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
   <div class="error" *ngIf="error">{{ error }}</div>
+  <div *ngIf="!loading && !error && searchQuery" style="padding: 8px; background: #e3f2fd; border-radius: 4px; margin-bottom: 16px; font-weight: 500;">
+    Found {{ filteredEvents.length }} result(s) for "{{ searchQuery }}"
+  </div>
   <div *ngIf="isOrganizer" class="create-event" style="margin-bottom:16px; padding:12px; border:1px solid #ddd; border-radius:8px;">
     <h3>Create New Event</h3>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -55,20 +68,107 @@
       {{ creating ? 'Creating...' : 'Create Event' }}
     </button>
   </div>
-  <div class="grid" *ngIf="!loading && !error">
-    <mat-card *ngFor="let e of events" class="event-card">
+  <div *ngIf="editingEvent" class="edit-event" style="margin-bottom:16px; padding:12px; border:2px solid #ff9800; border-radius:8px; background: rgba(255,152,0,0.05);">
+    <h3>Edit Event</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="editingEvent.title" name="title" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Date</mat-label>
+        <input matInput type="date" [(ngModel)]="editingEvent.date" name="date" placeholder="YYYY-MM-DD" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Time</mat-label>
+        <input matInput type="time" [(ngModel)]="editingEvent.time" name="time" placeholder="HH:MM" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Location</mat-label>
+        <input matInput [(ngModel)]="editingEvent.location" name="location" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" style="grid-column:1/-1;">
+        <mat-label>Description</mat-label>
+        <input matInput [(ngModel)]="editingEvent.description" name="description" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Max Volunteers</mat-label>
+        <input matInput type="number" [(ngModel)]="editingEvent.maxVolunteers" name="maxVolunteers" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Category</mat-label>
+        <select matNativeControl [(ngModel)]="editingEvent.category" name="category">
+          <option value="environment">Environment</option>
+          <option value="community">Community</option>
+          <option value="nss">NSS</option>
+          <option value="education">Education</option>
+          <option value="health">Health</option>
+          <option value="other">Other</option>
+        </select>
+      </mat-form-field>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button mat-raised-button color="accent" (click)="updateEvent()" [disabled]="editing[editingEvent.id]">
+        {{ editing[editingEvent.id] ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <button mat-raised-button (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && filteredEvents.length === 0 && searchQuery" style="padding: 20px; text-align: center; color: #999;">
+    <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #ccc; margin-bottom: 12px;">search</mat-icon>
+    <p>No events found matching "{{ searchQuery }}"</p>
+  </div>
+
+  <div class="grid" *ngIf="!loading && !error && filteredEvents.length > 0">
+    <mat-card *ngFor="let e of filteredEvents" class="event-card">
       <mat-card-title>{{ e.title }}</mat-card-title>
       <mat-card-content>
         <p>{{ e.description }}</p>
         <p>{{ e.date }} {{ e.time }} &#64; {{ e.location }}</p>
       </mat-card-content>
       <div style="padding: 0 16px 16px">
-        <button *ngIf="!registeredSet.has(e.id)" mat-raised-button color="primary" (click)="register(e.id)" [disabled]="registering[e.id]">
-          {{ registering[e.id] ? 'Registering...' : 'Register' }}
-        </button>
-        <div *ngIf="registeredSet.has(e.id)" style="display: flex; align-items: center; gap: 8px; color: #4caf50; font-weight: 500;">
-          <mat-icon>check_circle</mat-icon>
-          <span>Registered</span>
+        <div *ngIf="!isOrganizer" style="display: flex; gap: 8px;">
+          <button *ngIf="!registeredSet.has(e.id)" mat-raised-button color="primary" (click)="register(e.id)" [disabled]="registering[e.id]">
+            {{ registering[e.id] ? 'Registering...' : 'Register' }}
+          </button>
+          <div *ngIf="registeredSet.has(e.id)" style="display: flex; align-items: center; gap: 8px; color: #4caf50; font-weight: 500;">
+            <mat-icon>check_circle</mat-icon>
+            <span>Registered</span>
+          </div>
+        </div>
+        <div *ngIf="isOrganizer" style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button mat-raised-button color="primary" (click)="editEvent(e)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-raised-button color="accent" (click)="viewRegistrations(e.id)" [disabled]="loadingRegistrations[e.id]">
+            <mat-icon>{{ viewingRegistrations[e.id] ? 'expand_less' : 'expand_more' }}</mat-icon> 
+            {{ loadingRegistrations[e.id] ? 'Loading...' : (viewingRegistrations[e.id] ? 'Hide' : 'View') }} Registrations
+          </button>
+          <button *ngIf="!registeredSet.has(e.id)" mat-raised-button (click)="register(e.id)" [disabled]="registering[e.id]">
+            <mat-icon>app_registration</mat-icon>
+            {{ registering[e.id] ? 'Registering...' : 'Register' }}
+          </button>
+          <div *ngIf="registeredSet.has(e.id)" style="display: flex; align-items: center; gap: 8px; color: #4caf50; font-weight: 500; padding: 8px 12px; background: #e8f5e9; border-radius: 4px;">
+            <mat-icon>check_circle</mat-icon>
+            <span>Registered</span>
+          </div>
+          <button mat-raised-button color="warn" (click)="deleteEvent(e.id)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+        <div *ngIf="isOrganizer && viewingRegistrations[e.id]" style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 4px;">
+          <h4 style="margin-top: 0;">📋 Registered Students ({{ (registrations[e.id] || []).length }})</h4>
+          <div *ngIf="(registrations[e.id] || []).length === 0" style="color: #999; font-style: italic;">
+            No registrations yet
+          </div>
+          <div *ngFor="let reg of registrations[e.id] || []" style="padding: 8px; background: white; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>{{ reg.userName || reg.name || 'N/A' }}</strong><br/>
+              <small style="color: #666;">{{ reg.userEmail || reg.email || 'N/A' }}</small>
+            </div>
+            <small style="color: #999;">{{ reg.registeredAt ? (reg.registeredAt | date:'short') : 'N/A' }}</small>
+          </div>
         </div>
       </div>
     </mat-card>
